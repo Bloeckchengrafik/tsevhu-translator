@@ -1,2 +1,6 @@
 nltk
 numpy
+polars
+xlsx2csv
+levenshtein
+sentence-transformers

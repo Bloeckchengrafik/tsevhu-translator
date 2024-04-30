@@ -2,22 +2,24 @@ from translate import MultistageKoiTranslationEngine
 from sys import argv
 from pprint import pprint
 
-
-default_input = "The sun is setting"
+default_input = "I'm walking"
 engine = MultistageKoiTranslationEngine()
 
-def translate_koi(input):
-    return engine.digest(input)
+
+def translate_koi(value):
+    return engine.digest(value)
+
 
 def main():
-    sysargs = argv[1:]
-    input = default_input
-    if len(sysargs) > 0:
-        input = " ".join(sysargs)
+    sys_args = argv[1:]
+    value = default_input
+    if len(sys_args) > 0:
+        value = " ".join(sys_args)
     else:
         print(f"[W] Using default input '{default_input}'")
 
-    pprint(translate_koi(input))
+    pprint(translate_koi(value))
+
 
 if __name__ == "__main__":
     main()

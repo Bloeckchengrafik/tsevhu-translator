@@ -11,3 +11,6 @@ class UnknownContextWord:
 
     def is_particle(self):
         return self.nlp_tag == "PRT"
+
+    def __str__(self):
+        return f"<?:{self.value}>"

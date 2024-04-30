@@ -32,5 +32,4 @@ class MultistageKoiTranslationEngine:
 
     def digest(self, value: str) -> str:
         tokens, tagged, ne_chunked = tx(value.replace("'m", ""))
-        reduced = self.reducer(tagged)
-        return value
+        return self.reducer(tagged)

@@ -1,6 +1,7 @@
 import enum
 from dataclasses import dataclass
 
+from translate.context.compile import Compileable
 from translate.letters import VOWELS
 from translate.vocabulary import translate_verb
 from translate.vocabulary.translate_verb import TranslatedVerbBase
@@ -120,11 +121,22 @@ class Verb:
             affix=self.affix
         )
 
+    def __str__(self):
+        return f"<V:{self.value}>"
+
 
 @dataclass
-class TranslatedVerb:
+class TranslatedVerb(Compileable):
     english: str
     tsevhu: str
     translated_base: TranslatedVerbBase
     tense: FluidTense = lambda: FluidTense(None)
     affix: VerbAffixes = lambda: VerbAffixes.CONTINUOUS
+
+    def compile(self, punctuation_mark: str) -> str:
+        tense_part = self.tense.to_romanized_particle()
+        affix_part = self.affix.apply_particle(self.tsevhu, punctuation_mark)
+        return f"{affix_part} {tense_part}"
+
+    def __str__(self):
+        return f"<V:{self.tsevhu}>"

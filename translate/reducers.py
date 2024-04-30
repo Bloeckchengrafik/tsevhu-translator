@@ -1,5 +1,6 @@
 from pprint import pprint
 from translate.context import UnknownContextWord
+from translate.context.compile import Compileable
 from translate.verbs import determine_tense_and_affixes
 from translate.verbs.context import Verb
 
@@ -41,7 +42,7 @@ class ContextReducer:
 
         return outs
 
-    def try_translate_verbs(self, context: list[UnknownContextWord | Verb]):
+    def _try_translate_verbs(self, context: list[UnknownContextWord | Verb]):
         for i, word in enumerate(context):
             if isinstance(word, Verb):
                 word.value = word.value.removesuffix("ed")
@@ -49,6 +50,16 @@ class ContextReducer:
                 context[i] = word.translate()
 
         return context
+
+    def _compile_sentence(self, context: list, punct: str = "."):
+        words = []
+        for word in context:
+            if isinstance(word, Compileable):
+                words.append(word.compile(punct))
+            else:
+                words.append(str(word))
+
+        return " ".join(words) + punct
 
     def __call__(self, tagged: list[tuple[str, str]]):
         reducer_ctx = self._begin_reduce(tagged)
@@ -61,7 +72,10 @@ class ContextReducer:
         pprint(reducer_ctx)
 
         print("=== Verb Translation ===")
-        reducer_ctx = self.try_translate_verbs(reducer_ctx)
+        reducer_ctx = self._try_translate_verbs(reducer_ctx)
         pprint(reducer_ctx)
 
-        return reducer_ctx
+        print("=== Sentence Compilation ===")
+        compiled = self._compile_sentence(reducer_ctx)
+
+        return compiled

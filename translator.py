@@ -1,6 +1,5 @@
 from translate import MultistageKoiTranslationEngine
 from sys import argv
-from pprint import pprint
 
 default_input = "I'm walking"
 engine = MultistageKoiTranslationEngine()
@@ -18,7 +17,7 @@ def main():
     else:
         print(f"[W] Using default input '{default_input}'")
 
-    pprint(translate_koi(value))
+    print(translate_koi(value))
 
 
 if __name__ == "__main__":

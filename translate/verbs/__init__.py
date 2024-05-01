@@ -166,7 +166,7 @@ def determine_tense_and_affixes(verbs: list[str]) -> (FluidTense, VerbAffixes):
                 )
 
     # Tri-verb constructions
-    if (len(verbs) == 3) and (verbs[0] in AUXILIARY_VERBS) or (verbs[0] in FUTURE_AUX):
+    if (len(verbs) == 3) and ((verbs[0] in AUXILIARY_VERBS) or (verbs[0] in FUTURE_AUX)):
         """
         either:
         - present perfect continuous

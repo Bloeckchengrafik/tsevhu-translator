@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 from translate.context.compile import Compileable
 from translate.letters import VOWELS
+from translate.verbs.mood import VerbMoodPartices
 from translate.vocabulary import translate_verb
 from translate.vocabulary.translate_verb import TranslatedVerbBase
 
@@ -107,10 +108,12 @@ class Verb:
     tense: FluidTense = lambda: FluidTense(None)
     affix: VerbAffixes = lambda: VerbAffixes.CONTINUOUS
 
-    def translate(self, context: list[str] = None):
+    def translate(self, sentence: str, subject_active: bool, context: list[str] = None):
         ctx = context or []
         ctx.extend(self.tense.to_discrete().name.lower().split(" "))
         ctx.extend(self.affix.name.lower().split(" "))
+
+        mood = VerbMoodPartices.particles_for(sentence)
 
         record: TranslatedVerbBase = translate_verb.translate_verb_base(self.value, ctx)
         return TranslatedVerb(
@@ -118,7 +121,8 @@ class Verb:
             tsevhu=record.verb,
             translated_base=record,
             tense=self.tense,
-            affix=self.affix
+            affix=self.affix,
+            mood=mood
         )
 
     def __str__(self):
@@ -132,11 +136,13 @@ class TranslatedVerb(Compileable):
     translated_base: TranslatedVerbBase
     tense: FluidTense = lambda: FluidTense(None)
     affix: VerbAffixes = lambda: VerbAffixes.CONTINUOUS
+    mood: list[VerbMoodPartices] = lambda: []
 
     def compile(self, punctuation_mark: str) -> str:
         tense_part = self.tense.to_romanized_particle()
         affix_part = self.affix.apply_particle(self.tsevhu, punctuation_mark)
-        return f"{affix_part} {tense_part}"
+        particle = VerbMoodPartices.concat(self.mood)
+        return f"{particle} {affix_part} {tense_part}".strip().replace("  ", " ")
 
     def __str__(self):
         return f"<V:{self.tsevhu}>"

@@ -3,6 +3,7 @@ from translate.context import UnknownContextWord
 from translate.context.compile import Compileable
 from translate.verbs import determine_tense_and_affixes
 from translate.verbs.context import Verb
+from translate.vocabulary.embedding_utils import subject_active
 
 
 class ContextReducer:
@@ -26,7 +27,7 @@ class ContextReducer:
                     outs = outs[:-2]
                 else:
                     tense, affix = determine_tense_and_affixes([prev.value, verb])
-                # outs = outs[:-2]
+                    outs = outs[:-1]
                 out = Verb(verb, tense, affix)
             elif word.is_verb():
                 tense, affix = determine_tense_and_affixes([word.value])
@@ -42,16 +43,20 @@ class ContextReducer:
 
         return outs
 
-    def _try_translate_verbs(self, context: list[UnknownContextWord | Verb]):
+    def _try_translate_verbs(self, sentence: str, context: list[UnknownContextWord | Verb], subject_is_active: bool):
         for i, word in enumerate(context):
             if isinstance(word, Verb):
                 word.value = word.value.removesuffix("ed")
                 word.value = word.value.removesuffix("ing")
-                context[i] = word.translate()
+                # setting -> sett -> set
+                if len(word.value) > 2 and word.value[-1] == word.value[-2]:
+                    word.value = word.value[:-1]
+                context[i] = word.translate(sentence, subject_is_active)
 
         return context
 
-    def _compile_sentence(self, context: list, punct: str = "."):
+    def _compile_sentence(self, full: str, context: list):
+        punct = full[-1] if full[-1] in [".", "!", "?"] else "."
         words = []
         for word in context:
             if isinstance(word, Compileable):
@@ -61,21 +66,22 @@ class ContextReducer:
 
         return " ".join(words) + punct
 
-    def __call__(self, tagged: list[tuple[str, str]]):
+    def __call__(self, tagged: list[tuple[str, str]], full):
         reducer_ctx = self._begin_reduce(tagged)
 
         print("=== Context Reducer ===")
         pprint(reducer_ctx)
+        subject_is_active = subject_active(full)
 
         print("=== Verb Linting ===")
         reducer_ctx = self._reduce_and_lint_verbs(reducer_ctx)
         pprint(reducer_ctx)
 
         print("=== Verb Translation ===")
-        reducer_ctx = self._try_translate_verbs(reducer_ctx)
+        reducer_ctx = self._try_translate_verbs(full, reducer_ctx, subject_is_active)
         pprint(reducer_ctx)
 
         print("=== Sentence Compilation ===")
-        compiled = self._compile_sentence(reducer_ctx)
+        compiled = self._compile_sentence(full, reducer_ctx)
 
         return compiled

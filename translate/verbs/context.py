@@ -51,12 +51,13 @@ class FluidTense:
         if self.value is None:
             return DiscreteTense.PRESENT
 
-        # Get nearest discrete verbs
-        all_tenses = list(DiscreteTense)
-        all_tenses_values = [tense.value for tense in all_tenses]
-        nearest_tense = min(all_tenses_values, key=lambda x: abs(x - self.value) if x else 1000000)
+        # Get nearest discrete tense
+        nearest_tense = min(list(DiscreteTense), key=lambda x: abs(x.value - self.value) if x.value is not None else 1000000)
 
         return DiscreteTense(nearest_tense)
+
+    def __repr__(self):
+        return f"<FluidTense {self.value} ({self.to_discrete().name})>"
 
     def to_romanized_particle(self) -> str:
         # TODO implement adjacent verbs particles

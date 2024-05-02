@@ -97,7 +97,7 @@ def subject_active(term: str) -> bool:
     """
     Returns True if the subject is active
     """
-    return most_similar(term, ["subject active", "subject passive"]) == "active"
+    return most_similar(term, ["active", "passive"]) == "active"
 
 
 if __name__ == '__main__':

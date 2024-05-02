@@ -11,6 +11,24 @@ class TranslatedVerbBase:
     meaning: str
     verb_class: str
     pronunciation: str
+    active: bool
+
+
+def is_active(verb: str) -> bool:
+    stative_endings = [
+        "'en",
+        "cet",
+        "vh",
+        "vhi",
+        "non",
+        "ak",
+        "ge"
+    ]
+
+    for ending in stative_endings:
+        if verb.endswith(ending):
+            return False
+    return True
 
 
 def transform_first_row(values_near: pl.DataFrame) -> TranslatedVerbBase:
@@ -19,7 +37,8 @@ def transform_first_row(values_near: pl.DataFrame) -> TranslatedVerbBase:
         verb=vl[0],
         meaning=vl[3],
         verb_class=vl[4],
-        pronunciation=vl[1]
+        pronunciation=vl[1],
+        active=is_active(vl[0])
     )
 
 
@@ -54,7 +73,8 @@ def translate_verb_base(english: str, context_cues: list[str] = None):
         verb=col["Word"],
         meaning=col["Meaning"],
         verb_class=col["POS"],
-        pronunciation=col["Pronunciation"]
+        pronunciation=col["Pronunciation"],
+        active=is_active(col["Word"])
     )
 
 

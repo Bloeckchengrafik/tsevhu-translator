@@ -1,4 +1,6 @@
-print("[I] Loading SentenceTransformer model...")
+from translate.log import tx_info
+
+tx_info("Loading SentenceTransformer model...")
 from sentence_transformers import SentenceTransformer
 from sentence_transformers.util import cos_sim
 

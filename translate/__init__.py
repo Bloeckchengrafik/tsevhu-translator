@@ -2,11 +2,11 @@ import nltk
 from nltk.tree import TreePrettyPrinter
 
 from translate.context import UnknownContextWord
-from translate.reducers import ContextReducer
+from translate.reducers import run_reducer
 
 
-def tx(input: str):
-    tokens = nltk.word_tokenize(input)
+def tx(value: str):
+    tokens = nltk.word_tokenize(value)
     tagged = nltk.pos_tag(tokens, tagset="universal")
     ne_chunked = nltk.chunk.ne_chunk(tagged)
 
@@ -22,14 +22,10 @@ def pp_tree(tree):
 
 class MultistageKoiTranslationEngine:
     def __init__(self):
-        nltk.download("punkt")
-        nltk.download("averaged_perceptron_tagger")
-        nltk.download("maxent_ne_chunker")
-        nltk.download("words")
-        nltk.download("universal_tagset")
-
-        self.reducer = ContextReducer()
+        deps = ["punkt", "averaged_perceptron_tagger", "maxent_ne_chunker", "words"]
+        for dep in deps:
+            nltk.download(dep, quiet=True)
 
     def digest(self, value: str) -> str:
         tokens, tagged, ne_chunked = tx(value.replace("'m", ""))
-        return self.reducer(tagged, value)
+        return run_reducer(tagged, value)

@@ -52,7 +52,8 @@ class FluidTense:
             return DiscreteTense.PRESENT
 
         # Get nearest discrete tense
-        nearest_tense = min(list(DiscreteTense), key=lambda x: abs(x.value - self.value) if x.value is not None else 1000000)
+        nearest_tense = min(list(DiscreteTense),
+                            key=lambda x: abs(x.value - self.value) if x.value is not None else 1000000)
 
         return DiscreteTense(nearest_tense)
 
@@ -109,7 +110,7 @@ class Verb:
     tense: FluidTense = lambda: FluidTense(None)
     affix: VerbAffixes = lambda: VerbAffixes.CONTINUOUS
 
-    def translate(self, sentence: str, subject_active: bool, context: list[str] = None):
+    def translate(self, sentence: str, context: list[str] = None):
         ctx = context or []
         ctx.extend(self.tense.to_discrete().name.lower().split(" "))
         ctx.extend(self.affix.name.lower().split(" "))

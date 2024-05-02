@@ -143,7 +143,7 @@ class TranslatedVerb(Compileable):
     def compile(self, punctuation_mark: str) -> str:
         tense_part = self.tense.to_romanized_particle()
         affix_part = self.affix.apply_particle(self.tsevhu, punctuation_mark)
-        particle = VerbMoodPartices.concat(self.mood)
+        particle = ""  # VerbMoodPartices.concat(self.mood) todo fix
         return f"{particle} {affix_part} {tense_part}".strip().replace("  ", " ")
 
     def __str__(self):
